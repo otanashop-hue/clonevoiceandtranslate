@@ -1,0 +1,17 @@
+// ❌ این کد اشتباه است - هرگز استفاده نکنید!
+
+// ========== پردازش هر سمبل ==========
+for i = 0 to array.size(symbols) - 1
+    sym = array.get(symbols, i)
+    tf = array.get(tfs, i)
+
+    if str.length(sym) > 0
+        [sig, price, t] = request.security(sym, tf, f_Vanguard(), ...)
+
+        if not na(sig) and not na(t) and sig > 0
+            // ❌ بدون شرط - هر بار اجرا می‌شود!
+            dir = sig == 1 ? "LONG30" : sig == 2 ? "SHORT30" : sig == 3 ? "LONG60" : sig == 4 ? "SHORT60" : ""
+            if dir != ""
+                alert_message = dir + "-Vanguard@" + sym + "@" + str.tostring(price) + "@" + tf + "@" + user_id
+                alert(alert_message, alert.freq_once_per_bar_close)
+                // این کد هر تیک اجرا می‌شود! SPAM!

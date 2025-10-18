@@ -1,0 +1,482 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © marketcoder
+
+//@version=6
+indicator("Marketcoder Vanguard Multi-Symbol Robot", overlay=true,max_bars_back = 4000)
+
+// ========== تنظیمات ==========
+user_id = input.string("", "Telegram User ID")
+
+// ----------- سمبل‌ها و تایم‌فریم‌ها (۴۰ عدد) -----------
+sym1  = input.symbol("", "Symbol 1", group="Sym1")
+tf1   = input.timeframe("1h", "Timeframe 1", group="Sym1")
+
+sym2  = input.symbol("", "Symbol 2", group="Sym2")
+tf2   = input.timeframe("1h", "Timeframe 2", group="Sym2")
+
+sym3  = input.symbol("", "Symbol 3", group="Sym3")
+tf3   = input.timeframe("1h", "Timeframe 3", group="Sym3")
+
+sym4  = input.symbol("", "Symbol 4", group="Sym4")
+tf4   = input.timeframe("1h", "Timeframe 4", group="Sym4")
+
+sym5  = input.symbol("", "Symbol 5", group="Sym5")
+tf5   = input.timeframe("1h", "Timeframe 5", group="Sym5")
+
+sym6  = input.symbol("", "Symbol 6", group="Sym6")
+tf6   = input.timeframe("1h", "Timeframe 6", group="Sym6")
+
+sym7  = input.symbol("", "Symbol 7", group="Sym7")
+tf7   = input.timeframe("1h", "Timeframe 7", group="Sym7")
+
+sym8  = input.symbol("", "Symbol 8", group="Sym8")
+tf8   = input.timeframe("1h", "Timeframe 8", group="Sym8")
+
+sym9  = input.symbol("", "Symbol 9", group="Sym9")
+tf9   = input.timeframe("1h", "Timeframe 9", group="Sym9")
+
+sym10 = input.symbol("", "Symbol 10", group="Sym10")
+tf10  = input.timeframe("1h", "Timeframe 10", group="Sym10")
+
+sym11 = input.symbol("", "Symbol 11", group="Sym11")
+tf11  = input.timeframe("1h", "Timeframe 11", group="Sym11")
+
+sym12 = input.symbol("", "Symbol 12", group="Sym12")
+tf12  = input.timeframe("1h", "Timeframe 12", group="Sym12")
+
+sym13 = input.symbol("", "Symbol 13", group="Sym13")
+tf13  = input.timeframe("1h", "Timeframe 13", group="Sym13")
+
+sym14 = input.symbol("", "Symbol 14", group="Sym14")
+tf14  = input.timeframe("1h", "Timeframe 14", group="Sym14")
+
+sym15 = input.symbol("", "Symbol 15", group="Sym15")
+tf15  = input.timeframe("1h", "Timeframe 15", group="Sym15")
+
+sym16 = input.symbol("", "Symbol 16", group="Sym16")
+tf16  = input.timeframe("1h", "Timeframe 16", group="Sym16")
+
+sym17 = input.symbol("", "Symbol 17", group="Sym17")
+tf17  = input.timeframe("1h", "Timeframe 17", group="Sym17")
+
+sym18 = input.symbol("", "Symbol 18", group="Sym18")
+tf18  = input.timeframe("1h", "Timeframe 18", group="Sym18")
+
+sym19 = input.symbol("", "Symbol 19", group="Sym19")
+tf19  = input.timeframe("1h", "Timeframe 19", group="Sym19")
+
+sym20 = input.symbol("", "Symbol 20", group="Sym20")
+tf20  = input.timeframe("1h", "Timeframe 20", group="Sym20")
+
+sym21 = input.symbol("", "Symbol 21", group="Sym21")
+tf21  = input.timeframe("1h", "Timeframe 21", group="Sym21")
+
+sym22 = input.symbol("", "Symbol 22", group="Sym22")
+tf22  = input.timeframe("1h", "Timeframe 22", group="Sym22")
+
+sym23 = input.symbol("", "Symbol 23", group="Sym23")
+tf23  = input.timeframe("1h", "Timeframe 23", group="Sym23")
+
+sym24 = input.symbol("", "Symbol 24", group="Sym24")
+tf24  = input.timeframe("1h", "Timeframe 24", group="Sym24")
+
+sym25 = input.symbol("", "Symbol 25", group="Sym25")
+tf25  = input.timeframe("1h", "Timeframe 25", group="Sym25")
+
+sym26 = input.symbol("", "Symbol 26", group="Sym26")
+tf26  = input.timeframe("1h", "Timeframe 26", group="Sym26")
+
+sym27 = input.symbol("", "Symbol 27", group="Sym27")
+tf27  = input.timeframe("1h", "Timeframe 27", group="Sym27")
+
+sym28 = input.symbol("", "Symbol 28", group="Sym28")
+tf28  = input.timeframe("1h", "Timeframe 28", group="Sym28")
+
+sym29 = input.symbol("", "Symbol 29", group="Sym29")
+tf29  = input.timeframe("1h", "Timeframe 29", group="Sym29")
+
+sym30 = input.symbol("", "Symbol 30", group="Sym30")
+tf30  = input.timeframe("1h", "Timeframe 30", group="Sym30")
+
+// ---------- Build arrays (symbols & tfs) ----------
+symbols = array.new_string()
+tfs     = array.new_string()
+
+for i = 0 to 29
+    s = switch i
+        0 => sym1
+        1 => sym2
+        2 => sym3
+        3 => sym4
+        4 => sym5
+        5 => sym6
+        6 => sym7
+        7 => sym8
+        8 => sym9
+        9 => sym10
+        10 => sym11
+        11 => sym12
+        12 => sym13
+        13 => sym14
+        14 => sym15
+        15 => sym16
+        16 => sym17
+        17 => sym18
+        18 => sym19
+        19 => sym20
+        20 => sym21
+        21 => sym22
+        22 => sym23
+        23 => sym24
+        24 => sym25
+        25 => sym26
+        26 => sym27
+        27 => sym28
+        28 => sym29
+        29 => sym30
+
+        => ""
+    tf = switch i
+        0 => tf1
+        1 => tf2
+        2 => tf3
+        3 => tf4
+        4 => tf5
+        5 => tf6
+        6 => tf7
+        7 => tf8
+        8 => tf9
+        9 => tf10
+        10 => tf11
+        11 => tf12
+        12 => tf13
+        13 => tf14
+        14 => tf15
+        15 => tf16
+        16 => tf17
+        17 => tf18
+        18 => tf19
+        19 => tf20
+        20 => tf21
+        21 => tf22
+        22 => tf23
+        23 => tf24
+        24 => tf25
+        25 => tf26
+        26 => tf27
+        27 => tf28
+        28 => tf29
+        29 => tf30
+        => "1h"
+
+    if str.length(s) > 0
+        array.push(symbols, s)
+        array.push(tfs, tf)
+
+f_Vanguard() =>
+    ema1 = ta.ema(hl2, 30)
+    ema2 = ta.ema(hl2, 60)
+    ema3 = ta.ema(hl2, 144)
+    ema4 = ta.ema(hl2, 240)
+    anchor = timeframe.change("1D")
+    vwap = ta.vwap(hlc3, anchor)
+    rsi_low  = 38
+    rsi_high = 61
+    rsi_low2  = 38
+    rsi_high2 = 61
+    cci_low = -100
+    cci_high = 100
+    iscci = false
+    iswvap = false
+    rsi=ta.rsi(close,14)
+    cci=ta.cci(hlc3,20)
+    pll=ta.pivotlow(rsi,2,2)
+    rsiob = false
+    rsiobnum = 0
+    ii=0
+    for i = 0 to 100
+        if not na(pll[i])
+            for j = 0 to i + 2
+                if rsi[j]>=70
+                    rsiob:=true
+                    rsiobnum:=j
+                    ii=i+2
+                    break
+    firsttoch = -1
+    for i = 0 to rsiobnum
+        if low[i]<ema1[i]
+            firsttoch:=i
+    nogreencandle = false
+    greennum=0
+    if firsttoch>0
+        for i = 1 to firsttoch
+            if close[i]>open[i]
+                nogreencandle:=true
+
+    tochema30 = firsttoch>=0 ? (low[firsttoch]<ema1[firsttoch] and close[firsttoch]>open[firsttoch] and firsttoch==0) or (low[firsttoch]<ema1[firsttoch] and nogreencandle==false and close>ema1 and close>open and firsttoch>=0) : false
+    close_under_ema30 = false
+    aboveema1num=0
+    for i=1 to rsiobnum
+        if low[i]>ema1[i]
+            aboveema1num:=i
+
+    if tochema30
+        for i=aboveema1num to rsiobnum
+            if close[i]<ema1[i]
+                close_under_ema30:=true
+    red_after_greennum=0
+    if firsttoch>=0
+        for i=0 to firsttoch
+            if close[i]>open[i] and firsttoch>0
+                red_after_greennum:=i+1
+    base2rsinum = firsttoch==0 and close[firsttoch]>open[firsttoch] ? firsttoch : red_after_greennum
+
+    base2rsi=rsi[base2rsinum]
+    for i =base2rsinum to rsiobnum
+        if rsi[i]<base2rsi
+            base2rsi:=rsi[i]
+    rsi_above_rsilow=true
+    for i = 0 to rsiobnum
+        if rsi[i]<rsi_low
+            rsi_above_rsilow := false
+    plnum = 0
+    rsiob_ok=true
+    firstfor30 = true
+    for i = rsiobnum to 100
+        if not na(pll[i])
+            if rsiob and rsi[i+2]>=rsi_low and rsi[i+2]<=rsi_high
+                for k=rsiobnum to i + 2
+                    if rsi[k]<rsi[i+2]
+                        rsiob_ok:=false
+                        break
+                if  rsiob_ok and firstfor30
+                    plnum := i +2
+                    firstfor30:=false
+                if rsiob_ok  and low[base2rsinum]>low[i+2] and plnum>0 and base2rsi<rsi[ i +2]
+                    plnum := i +2
+
+    ccibuy_30 = iscci ? cci<=0 : true
+    vwapbuy30 = iswvap ? close[plnum]>vwap[plnum] : true
+
+    buy =  firsttoch>=0 and base2rsi<rsi[plnum] and plnum>0 and tochema30  and vwapbuy30 and ema2>ema4 and low[base2rsinum]>low[plnum] and rsi>rsi_low and rsi_above_rsilow and ccibuy_30
+
+    okbuy=true
+    for i=1 to rsiobnum
+        if buy[i]
+            okbuy:=false
+
+//////////////// BUY 60  /////////////////////
+
+    firsttoch60 = -1
+    for i = 0 to rsiobnum
+        if low[i]<ema2[i]
+            firsttoch60:=i
+    nogreencandle60 = false
+    if firsttoch60>0
+        for i = 1 to firsttoch60
+            if close[i]>open[i]
+                nogreencandle60:=true
+
+    tochema60 = firsttoch60>=0 ? (low[firsttoch60]<ema2[firsttoch60] and close[firsttoch60]>open[firsttoch60] and firsttoch60==0) or (low[firsttoch60]<ema2[firsttoch60] and nogreencandle60==false and close>ema2 and close>open and firsttoch60>=0) : false
+
+    red_after_greennum60=0
+    if firsttoch60>=0
+        for i=0 to firsttoch60
+            if close[i]>open[i] and firsttoch60>0
+                red_after_greennum60:=i+1
+
+    base2rsinum60 = firsttoch60==0 and close[firsttoch60]>open[firsttoch60] ? firsttoch60 : red_after_greennum60
+
+    base2rsi60=rsi[base2rsinum60]
+    for i =base2rsinum60 to rsiobnum
+        if rsi[i]<base2rsi60
+            base2rsi60:=rsi[i]
+
+    rsi_above_rsilow60=true
+    for i = 0 to rsiobnum
+        if rsi[i]<rsi_low
+            rsi_above_rsilow60 := false
+
+    ccibuy_60 = iscci ? cci<cci_low : true
+
+    buy60 =  firsttoch60>=0 and base2rsi60<rsi[plnum] and plnum>0 and tochema60  and vwapbuy30 and ema2>ema4 and low[base2rsinum60]>low[plnum] and rsi>rsi_low and rsi_above_rsilow60 and ccibuy_60
+    
+    // تغییر اصلی: okbuy60 از rsiobnum جداگانه استفاده می‌کند
+    okbuy60=true
+    for i=1 to rsiobnum
+        if buy60[i]
+            okbuy60:=false
+
+//////////////// SHORT30 /////////////////////
+
+    phh=ta.pivothigh(rsi,2,2)
+
+    rsiob2 = false
+    rsiobnum2 = 0
+
+    ii2=0
+    for i = 0 to 100
+        if not na(phh[i])
+            for j = 0 to i + 2
+                if rsi[j]<=30
+                    rsiob2:=true
+                    rsiobnum2:=j
+                    ii2=i+2
+                    break
+
+    firsttoch30_2 = -1
+    for i = 0 to rsiobnum2
+        if high[i]>ema1[i]
+            firsttoch30_2:=i
+    nogreencandle2 = false
+    if firsttoch30_2>0
+        for i = 1 to firsttoch30_2
+            if close[i]<open[i]
+                nogreencandle2:=true
+
+    tochema30_2 = firsttoch30_2>=0 ? (high[firsttoch30_2]>ema1[firsttoch30_2] and close[firsttoch30_2]<open[firsttoch30_2] and firsttoch30_2==0) or (high[firsttoch30_2]>ema1[firsttoch30_2] and nogreencandle2==false and close<ema1 and close<open and firsttoch30_2>=0) : false
+
+    red_after_greennum2=0
+    if firsttoch30_2>=0
+        for i=0 to firsttoch30_2
+            if close[i]<open[i] and firsttoch30_2>0
+                red_after_greennum2:=i+1
+
+    base2rsinum2 = firsttoch30_2==0 and close[firsttoch30_2]<open[firsttoch30_2] ? firsttoch30_2 : red_after_greennum2
+
+    base2rsi2=rsi[base2rsinum2]
+    for i =base2rsinum2 to rsiobnum2
+        if rsi[i]>base2rsi2
+            base2rsi2:=rsi[i]
+
+    rsi_above_rsihigh=true
+    for i = 0 to rsiobnum2
+        if rsi[i]>rsi_high2
+            rsi_above_rsihigh := false
+
+    phnum = 0
+    rsiob_ok2=true
+    firstfor = true
+    for i = rsiobnum2 to 100
+        if not na(phh[i])
+            if rsiob2 and rsi[i+2]<=rsi_high2 and rsi[i+2]>=rsi_low2
+                for k=rsiobnum2 to i + 2
+                    if rsi[k]>rsi[i+2]
+                        rsiob_ok2:=false
+                        break
+                if  rsiob_ok2 and firstfor
+                    phnum := i +2
+                    firstfor:=false
+                if rsiob_ok2  and high[base2rsinum2]<high[i+2] and phnum>0 and base2rsi2>rsi[ i +2]
+                    phnum := i +2
+ 
+    ccisell = iscci ? cci>=0 : true
+    vwapsell = iswvap ?  close[phnum]<vwap[phnum] : true
+
+    sell =  firsttoch30_2>=0 and base2rsi2>rsi[phnum] and phnum>0 and tochema30_2  and vwapsell and ema2<ema4 and high[base2rsinum2]<high[phnum] and rsi<rsi_high2 and rsi_above_rsihigh
+
+    oksell=true
+    for i=1 to rsiobnum2
+        if sell[i]
+            oksell:=false
+
+//////////////// SHORT60 /////////////////////
+
+    firsttoch602 = -1
+    for i = 0 to rsiobnum2
+        if high[i]>ema2[i]
+            firsttoch602:=i
+    nogreencandle602 = false
+    if firsttoch602>0
+        for i = 1 to firsttoch602
+            if close[i]<open[i]
+                nogreencandle602:=true
+
+    tochema602 = firsttoch602>=0 ? (high[firsttoch602]>ema2[firsttoch602] and close[firsttoch602]<open[firsttoch602] and firsttoch602==0) or (high[firsttoch602]>ema2[firsttoch602] and nogreencandle602==false and close<ema2 and close<open and firsttoch602>=0) : false
+
+    red_after_greennum602=0
+    if firsttoch602>=0
+        for i=0 to firsttoch602
+            if close[i]<open[i] and firsttoch602>0
+                red_after_greennum602:=i+1
+
+    base2rsinum602 = firsttoch602==0 and close[firsttoch602]<open[firsttoch602] ? firsttoch602 : red_after_greennum602
+
+    base2rsi602=rsi[base2rsinum602]
+    for i =base2rsinum602 to rsiobnum2
+        if rsi[i]>base2rsi602
+            base2rsi602:=rsi[i]
+
+    rsi_above_rsihigh60=true
+    for i = 0 to rsiobnum2
+        if rsi[i]>rsi_high2
+            rsi_above_rsihigh60 := false
+
+    ccisell60 = iscci ? cci>cci_high : true
+
+    sell60 =  firsttoch60>=0 and base2rsi602>rsi[phnum] and phnum>0 and tochema602  and vwapsell and ema2<ema4 and high[base2rsinum602]<high[phnum] and rsi<rsi_high2 and rsi_above_rsihigh60 and ccisell60
+    oksell60=true
+    for i=1 to rsiobnum2
+        if sell60[i]
+            oksell60:=false
+
+    sig = 5
+    if buy and okbuy
+        sig := 1  // Buy
+    if sell and oksell
+        sig := 2  // Sell
+    if buy60 and okbuy60
+        sig := 3  // Buy
+    if sell60 and oksell60
+        sig := 4  // Sell
+    
+    // بازگرداندن شرط barstate.isconfirmed
+    // حالا فقط زمانی سیگنال ارسال می‌شود که کندل بسته شده باشد
+    if sig<5
+        if not barstate.isconfirmed
+            [na, na, na]
+        else
+            [sig, close, time]
+    else
+        [na, na, na]
+
+// ---------- If no symbols, do nothing ----------
+msg = ""
+if array.size(symbols) == 0
+    na
+else
+    // ========== حافظه آخرین زمان سیگنال برای هر سمبل ==========
+    var lastTimes = array.new_int(array.size(symbols), 0)
+    var lastSigs = array.new_int(array.size(symbols), 0)
+
+    // ========== پردازش هر سمبل ==========
+    for i = 0 to array.size(symbols) - 1
+        sym = array.get(symbols, i)
+        tf = array.get(tfs, i)
+
+        if str.length(sym) > 0
+            // دریافت همه داده‌ها در یک request.security
+            [sig, price, t] = request.security(
+                 sym, 
+                 tf, 
+                 f_Vanguard(),
+                 gaps=barmerge.gaps_off,
+                 lookahead=barmerge.lookahead_off,
+                 ignore_invalid_symbol=true
+             )
+
+            if not na(sig) and not na(t) and sig > 0
+                last_t = array.get(lastTimes, i)
+                last_sig = array.get(lastSigs, i)
+                
+                // هر سمبل مستقل از دیگری بررسی می‌شود
+                if t != last_t or sig != last_sig
+                    array.set(lastTimes, i, t)
+                    array.set(lastSigs, i, sig)
+
+                    dir = sig == 1 ? "LONG30" : sig == 2 ? "SHORT30" : sig == 3 ? "LONG60" : sig == 4 ? "SHORT60" : ""
+                    if dir != ""
+                        msg := msg + dir + "-Vanguard@" + sym + "@" + str.tostring(price) + "@" + tf + "@" + user_id + "|"
+
+if msg != ""
+    alert(msg, alert.freq_once_per_bar_close)
