@@ -1,0 +1,407 @@
+//@version=5
+indicator("Multi-Symbol Multi-Timeframe Signal Generator", shorttitle="MSMT Signals", overlay=true, max_labels_count=500, max_lines_count=500, max_boxes_count=500)
+
+// ============================================================================
+// INPUT PARAMETERS
+// ============================================================================
+
+// Symbol inputs (20 symbols)
+symbol1 = input.string("BTCUSDT", "Symbol 1", group="Symbols")
+symbol2 = input.string("ETHUSDT", "Symbol 2", group="Symbols")
+symbol3 = input.string("ADAUSDT", "Symbol 3", group="Symbols")
+symbol4 = input.string("DOTUSDT", "Symbol 4", group="Symbols")
+symbol5 = input.string("LINKUSDT", "Symbol 5", group="Symbols")
+symbol6 = input.string("LTCUSDT", "Symbol 6", group="Symbols")
+symbol7 = input.string("BCHUSDT", "Symbol 7", group="Symbols")
+symbol8 = input.string("XLMUSDT", "Symbol 8", group="Symbols")
+symbol9 = input.string("EOSUSDT", "Symbol 9", group="Symbols")
+symbol10 = input.string("TRXUSDT", "Symbol 10", group="Symbols")
+symbol11 = input.string("XMRUSDT", "Symbol 11", group="Symbols")
+symbol12 = input.string("DASHUSDT", "Symbol 12", group="Symbols")
+symbol13 = input.string("ZECUSDT", "Symbol 13", group="Symbols")
+symbol14 = input.string("NEOUSDT", "Symbol 14", group="Symbols")
+symbol15 = input.string("IOTAUSDT", "Symbol 15", group="Symbols")
+symbol16 = input.string("ETCUSDT", "Symbol 16", group="Symbols")
+symbol17 = input.string("XRPUSDT", "Symbol 17", group="Symbols")
+symbol18 = input.string("DOGEUSDT", "Symbol 18", group="Symbols")
+symbol19 = input.string("SHIBUSDT", "Symbol 19", group="Symbols")
+symbol20 = input.string("MATICUSDT", "Symbol 20", group="Symbols")
+
+// Timeframe inputs (20 timeframes)
+timeframe1 = input.string("1", "Timeframe 1 (minutes)", group="Timeframes")
+timeframe2 = input.string("3", "Timeframe 2 (minutes)", group="Timeframes")
+timeframe3 = input.string("5", "Timeframe 3 (minutes)", group="Timeframes")
+timeframe4 = input.string("15", "Timeframe 4 (minutes)", group="Timeframes")
+timeframe5 = input.string("30", "Timeframe 5 (minutes)", group="Timeframes")
+timeframe6 = input.string("60", "Timeframe 6 (minutes)", group="Timeframes")
+timeframe7 = input.string("240", "Timeframe 7 (minutes)", group="Timeframes")
+timeframe8 = input.string("480", "Timeframe 8 (minutes)", group="Timeframes")
+timeframe9 = input.string("1D", "Timeframe 9", group="Timeframes")
+timeframe10 = input.string("3D", "Timeframe 10", group="Timeframes")
+timeframe11 = input.string("1W", "Timeframe 11", group="Timeframes")
+timeframe12 = input.string("1M", "Timeframe 12", group="Timeframes")
+timeframe13 = input.string("2", "Timeframe 13 (minutes)", group="Timeframes")
+timeframe14 = input.string("4", "Timeframe 14 (minutes)", group="Timeframes")
+timeframe15 = input.string("6", "Timeframe 15 (minutes)", group="Timeframes")
+timeframe16 = input.string("12", "Timeframe 16 (minutes)", group="Timeframes")
+timeframe17 = input.string("45", "Timeframe 17 (minutes)", group="Timeframes")
+timeframe18 = input.string("90", "Timeframe 18 (minutes)", group="Timeframes")
+timeframe19 = input.string("180", "Timeframe 19 (minutes)", group="Timeframes")
+timeframe20 = input.string("360", "Timeframe 20 (minutes)", group="Timeframes")
+
+// Alert settings
+enable_alerts = input.bool(true, "Enable Alerts", group="Alert Settings")
+show_table = input.bool(true, "Show Signal Table", group="Display Settings")
+max_signals_display = input.int(10, "Max Signals to Display", minval=1, maxval=50, group="Display Settings")
+
+// ============================================================================
+// VANGUARD FUNCTION
+// ============================================================================
+
+f_Vanguard() =>
+    ema1 = ta.ema(hl2, 30)
+    ema2 = ta.ema(hl2, 60)
+    ema3 = ta.ema(hl2, 144)
+    ema4 = ta.ema(hl2, 240)
+    anchor = timeframe.change("1D")
+    vwap = ta.vwap(hlc3, anchor)
+    rsi_low  = 38
+    rsi_high = 61
+    rsi_low2  = 38
+    rsi_high2 = 61
+    cci_low = -100
+    cci_high = 100
+    iscci = false
+    iswvap = false
+    rsi=ta.rsi(close,14)
+    cci=ta.cci(hlc3,20)
+    pll=ta.pivotlow(rsi,2,2)
+    rsiob = false
+    rsiobnum = 0
+    ii=0
+    for i = 0 to 100
+        if not na(pll[i])
+            for j = 0 to i + 2
+                if rsi[j]>=70
+                    rsiob:=true
+                    rsiobnum:=j
+                    ii=i+2
+                    break
+    firsttoch = -1
+    for i = 0 to rsiobnum
+        if low[i]<ema1[i]
+            firsttoch:=i
+    nogreencandle = false
+    greennum=0
+    if firsttoch>0
+        for i = 1 to firsttoch
+            if close[i]>open[i]
+                nogreencandle:=true
+
+    tochema30 = firsttoch>=0 ? (low[firsttoch]<ema1[firsttoch] and close[firsttoch]>open[firsttoch] and firsttoch==0) or (low[firsttoch]<ema1[firsttoch] and nogreencandle==false and close>ema1 and close>open and firsttoch>=0) : false
+    close_under_ema30 = false
+    aboveema1num=0
+    for i=1 to rsiobnum
+        if low[i]>ema1[i]
+            aboveema1num:=i
+
+    if tochema30
+        for i=aboveema1num to rsiobnum
+            if close[i]<ema1[i]
+                close_under_ema30:=true
+    red_after_greennum=0
+    if firsttoch>=0
+        for i=0 to firsttoch
+            if close[i]>open[i] and firsttoch>0
+                red_after_greennum:=i+1
+    base2rsinum = firsttoch==0 and close[firsttoch]>open[firsttoch] ? firsttoch : red_after_greennum
+
+    base2rsi=rsi[base2rsinum]
+    for i =base2rsinum to rsiobnum
+        if rsi[i]<base2rsi
+            base2rsi:=rsi[i]
+    rsi_above_rsilow=true
+    for i = 0 to rsiobnum
+        if rsi[i]<rsi_low
+            rsi_above_rsilow := false
+    plnum = 0
+    rsiob_ok=true
+    firstfor30 = true
+    for i = rsiobnum to 100
+        if not na(pll[i])
+            if rsiob and rsi[i+2]>=rsi_low and rsi[i+2]<=rsi_high
+                for k=rsiobnum to i + 2
+                    if rsi[k]<rsi[i+2]
+                        rsiob_ok:=false
+                        break
+                if  rsiob_ok and firstfor30
+                    plnum := i +2
+                    firstfor30:=false
+                if rsiob_ok  and low[base2rsinum]>low[i+2] and plnum>0 and base2rsi<rsi[ i +2]
+                    plnum := i +2
+
+    ccibuy_30 = true// iscci ? cci<=0 : true
+    vwapbuy30 = true//iswvap ? close[plnum]>vwap[plnum] : true
+
+    buy =  firsttoch>=0 and base2rsi<rsi[plnum] and plnum>0 and tochema30  and vwapbuy30 and ema2>ema4 and low[base2rsinum]>low[plnum] and rsi>rsi_low and rsi_above_rsilow and ccibuy_30 //and close_under_ema30==false  and okrsi2
+
+    okbuy=true
+    for i=1 to rsiobnum
+        if buy[i]
+            okbuy:=false
+
+//////////////// BUY 60  /////////////////////
+
+    firsttoch60 = -1
+    for i = 0 to rsiobnum
+        if low[i]<ema2[i]
+            firsttoch60:=i
+    nogreencandle60 = false
+    if firsttoch60>0
+        for i = 1 to firsttoch60
+            if close[i]>open[i]
+                nogreencandle60:=true
+
+    tochema60 = firsttoch60>=0 ? (low[firsttoch60]<ema2[firsttoch60] and close[firsttoch60]>open[firsttoch60] and firsttoch60==0) or (low[firsttoch60]<ema2[firsttoch60] and nogreencandle60==false and close>ema2 and close>open and firsttoch60>=0) : false
+
+    red_after_greennum60=0
+    if firsttoch60>=0
+        for i=0 to firsttoch60
+            if close[i]>open[i] and firsttoch60>0
+                red_after_greennum60:=i+1
+
+    base2rsinum60 = firsttoch60==0 and close[firsttoch60]>open[firsttoch60] ? firsttoch60 : red_after_greennum60
+
+    base2rsi60=rsi[base2rsinum60]
+    for i =base2rsinum60 to rsiobnum
+        if rsi[i]<base2rsi60
+            base2rsi60:=rsi[i]
+
+    rsi_above_rsilow60=true
+    for i = 0 to rsiobnum
+        if rsi[i]<rsi_low
+            rsi_above_rsilow60 := false
+
+    ccibuy_60 = true//iscci ? cci<cci_low : true
+
+    buy60 =  firsttoch60>=0 and base2rsi60<rsi[plnum] and plnum>0 and tochema60  and vwapbuy30 and ema2>ema4 and low[base2rsinum60]>low[plnum] and rsi>rsi_low and rsi_above_rsilow60 and ccibuy_60
+    okbuy60=true
+    for i=1 to rsiobnum
+        if buy60[i]
+            okbuy60:=false
+
+//////////////// SHORT30 /////////////////////
+
+    phh=ta.pivothigh(rsi,2,2)
+
+    rsiob2 = false
+    rsiobnum2 = 0
+
+    ii2=0
+    for i = 0 to 100
+        if not na(phh[i])
+            for j = 0 to i + 2
+                if rsi[j]<=30
+                    rsiob2:=true
+                    rsiobnum2:=j
+                    ii2=i+2
+                    break
+
+    firsttoch30_2 = -1
+    for i = 0 to rsiobnum2
+        if high[i]>ema1[i]
+            firsttoch30_2:=i
+    nogreencandle2 = false
+    if firsttoch30_2>0
+        for i = 1 to firsttoch30_2
+            if close[i]<open[i]
+                nogreencandle2:=true
+
+    tochema30_2 = firsttoch30_2>=0 ? (high[firsttoch30_2]>ema1[firsttoch30_2] and close[firsttoch30_2]<open[firsttoch30_2] and firsttoch30_2==0) or (high[firsttoch30_2]>ema1[firsttoch30_2] and nogreencandle2==false and close<ema1 and close<open and firsttoch30_2>=0) : false
+
+    red_after_greennum2=0
+    if firsttoch30_2>=0
+        for i=0 to firsttoch30_2
+            if close[i]<open[i] and firsttoch30_2>0
+                red_after_greennum2:=i+1
+
+    base2rsinum2 = firsttoch30_2==0 and close[firsttoch30_2]<open[firsttoch30_2] ? firsttoch30_2 : red_after_greennum2
+
+    base2rsi2=rsi[base2rsinum2]
+    for i =base2rsinum2 to rsiobnum2
+        if rsi[i]>base2rsi2
+            base2rsi2:=rsi[i]
+
+    rsi_above_rsihigh=true
+    for i = 0 to rsiobnum2
+        if rsi[i]>rsi_high2
+            rsi_above_rsihigh := false
+
+    phnum = 0
+    rsiob_ok2=true
+    firstfor = true
+    for i = rsiobnum2 to 100
+        if not na(phh[i])
+            if rsiob2 and rsi[i+2]<=rsi_high2 and rsi[i+2]>=rsi_low2
+                for k=rsiobnum2 to i + 2
+                    if rsi[k]>rsi[i+2]
+                        rsiob_ok2:=false
+                        break
+                if  rsiob_ok2 and firstfor
+                    phnum := i +2
+                    firstfor:=false
+                if rsiob_ok2  and high[base2rsinum2]<high[i+2] and phnum>0 and base2rsi2>rsi[ i +2]
+                    phnum := i +2
+ 
+    ccisell = true//iscci ? cci>=0 : true
+    vwapsell = true//iswvap ?  close[phnum]<vwap[phnum] : true
+
+    sell =  firsttoch30_2>=0 and base2rsi2>rsi[phnum] and phnum>0 and tochema30_2  and vwapsell and ema2<ema4 and high[base2rsinum2]<high[phnum] and rsi<rsi_high2 and rsi_above_rsihigh //and close_under_ema30==false  and okrsi2
+
+    oksell=true
+    for i=1 to rsiobnum2
+        if sell[i]
+            oksell:=false
+
+//////////////// SHORT60 /////////////////////
+
+    firsttoch602 = -1
+    for i = 0 to rsiobnum2
+        if high[i]>ema2[i]
+            firsttoch602:=i
+    nogreencandle602 = false
+    if firsttoch602>0
+        for i = 1 to firsttoch602
+            if close[i]<open[i]
+                nogreencandle602:=true
+
+    tochema602 = firsttoch602>=0 ? (high[firsttoch602]>ema2[firsttoch602] and close[firsttoch602]<open[firsttoch602] and firsttoch602==0) or (high[firsttoch602]>ema2[firsttoch602] and nogreencandle602==false and close<ema2 and close<open and firsttoch602>=0) : false
+
+    red_after_greennum602=0
+    if firsttoch602>=0
+        for i=0 to firsttoch602
+            if close[i]<open[i] and firsttoch602>0
+                red_after_greennum602:=i+1
+
+
+    base2rsinum602 = firsttoch602==0 and close[firsttoch602]<open[firsttoch602] ? firsttoch602 : red_after_greennum602
+
+    base2rsi602=rsi[base2rsinum602]
+    for i =base2rsinum602 to rsiobnum2
+        if rsi[i]>base2rsi602
+            base2rsi602:=rsi[i]
+
+
+    rsi_above_rsihigh60=true
+    for i = 0 to rsiobnum2
+        if rsi[i]>rsi_high2
+            rsi_above_rsihigh60 := false
+
+    ccisell60 = true//iscci ? cci>cci_high : true
+
+    sell60 =  firsttoch60>=0 and base2rsi602>rsi[phnum] and phnum>0 and tochema602  and vwapsell and ema2<ema4 and high[base2rsinum602]<high[phnum] and rsi<rsi_high2 and rsi_above_rsihigh60 and ccisell60
+    oksell60=true
+    for i=1 to rsiobnum2
+        if sell60[i]
+            oksell60:=false
+
+
+    sig = 5
+    if buy and okbuy
+        sig := 1  // Buy
+    if sell and oksell
+        sig := 2  // Sell
+    if buy60 and okbuy60
+        sig := 3  // Buy
+    if sell60 and oksell60
+        sig := 4  // Sell
+    sig
+
+// ============================================================================
+// MULTI-SYMBOL MULTI-TIMEFRAME ANALYSIS
+// ============================================================================
+
+// Arrays to store signals
+var signal_data = array.new<string>()
+var signal_symbols = array.new<string>()
+var signal_timeframes = array.new<string>()
+var signal_types = array.new<string>()
+var signal_times = array.new<string>()
+
+// Function to get signal from different symbol/timeframe
+get_signal(symbol, tf) =>
+    [sig] = request.security(symbol, tf, [f_Vanguard()], lookahead=barmerge.lookahead_off)
+    sig
+
+// Function to add signal to arrays
+add_signal(symbol, timeframe, signal_type) =>
+    if array.size(signal_data) >= max_signals_display
+        array.shift(signal_data)
+        array.shift(signal_symbols)
+        array.shift(signal_timeframes)
+        array.shift(signal_types)
+        array.shift(signal_times)
+    
+    array.push(signal_data, symbol + " " + timeframe)
+    array.push(signal_symbols, symbol)
+    array.push(signal_timeframes, timeframe)
+    array.push(signal_types, signal_type)
+    array.push(signal_times, str.tostring(time))
+
+// Check all symbol/timeframe combinations
+check_signals() =>
+    // Create arrays for symbols and timeframes
+    symbols = array.from(symbol1, symbol2, symbol3, symbol4, symbol5, symbol6, symbol7, symbol8, symbol9, symbol10, symbol11, symbol12, symbol13, symbol14, symbol15, symbol16, symbol17, symbol18, symbol19, symbol20)
+    timeframes = array.from(timeframe1, timeframe2, timeframe3, timeframe4, timeframe5, timeframe6, timeframe7, timeframe8, timeframe9, timeframe10, timeframe11, timeframe12, timeframe13, timeframe14, timeframe15, timeframe16, timeframe17, timeframe18, timeframe19, timeframe20)
+    
+    // Check all combinations
+    for i = 0 to 19
+        for j = 0 to 19
+            current_symbol = array.get(symbols, i)
+            current_timeframe = array.get(timeframes, j)
+            sig = get_signal(current_symbol, current_timeframe)
+            
+            if sig == 1 and enable_alerts
+                alert("BUY Signal: " + current_symbol + " " + current_timeframe, alert.freq_once_per_bar)
+                add_signal(current_symbol, current_timeframe, "BUY")
+            if sig == 2 and enable_alerts
+                alert("SELL Signal: " + current_symbol + " " + current_timeframe, alert.freq_once_per_bar)
+                add_signal(current_symbol, current_timeframe, "SELL")
+            if sig == 3 and enable_alerts
+                alert("BUY60 Signal: " + current_symbol + " " + current_timeframe, alert.freq_once_per_bar)
+                add_signal(current_symbol, current_timeframe, "BUY60")
+            if sig == 4 and enable_alerts
+                alert("SELL60 Signal: " + current_symbol + " " + current_timeframe, alert.freq_once_per_bar)
+                add_signal(current_symbol, current_timeframe, "SELL60")
+
+// Call the signal checking function
+check_signals()
+
+// ============================================================================
+// VISUAL DISPLAY
+// ============================================================================
+
+// Create table to display signals
+if show_table and barstate.islast
+    var table signal_table = table.new(position.top_right, 4, max_signals_display + 1, bgcolor=color.white, border_width=1)
+    
+    // Table headers
+    table.cell(signal_table, 0, 0, "Symbol", text_color=color.black, bgcolor=color.gray)
+    table.cell(signal_table, 1, 0, "Timeframe", text_color=color.black, bgcolor=color.gray)
+    table.cell(signal_table, 2, 0, "Signal", text_color=color.black, bgcolor=color.gray)
+    table.cell(signal_table, 3, 0, "Time", text_color=color.black, bgcolor=color.gray)
+    
+    // Display signals
+    for i = 0 to math.min(array.size(signal_data) - 1, max_signals_display - 1)
+        signal_color = array.get(signal_types, i) == "BUY" or array.get(signal_types, i) == "BUY60" ? color.green : color.red
+        table.cell(signal_table, 0, i + 1, array.get(signal_symbols, i), text_color=color.black)
+        table.cell(signal_table, 1, i + 1, array.get(signal_timeframes, i), text_color=color.black)
+        table.cell(signal_table, 2, i + 1, array.get(signal_types, i), text_color=signal_color)
+        table.cell(signal_table, 3, i + 1, array.get(signal_times, i), text_color=color.black)
+
+// Plot current symbol signal on chart
+current_signal = f_Vanguard()
+plotshape(current_signal == 1, "BUY", shape.triangleup, location.belowbar, color.green, size=size.small)
+plotshape(current_signal == 2, "SELL", shape.triangledown, location.abovebar, color.red, size=size.small)
+plotshape(current_signal == 3, "BUY60", shape.triangleup, location.belowbar, color.lime, size=size.normal)
+plotshape(current_signal == 4, "SELL60", shape.triangledown, location.abovebar, color.orange, size=size.normal)
